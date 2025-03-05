@@ -4,17 +4,31 @@ import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import countriesGeoJson from './countries.geo.json';
 
-const Map = () => {
+const Map = ({ onCountrySelect }) => {
   const [geoJsonData, setGeoJsonData] = useState(null);
+  const [countryColors, setCountryColors] = useState({});
 
   useEffect(() => {
     setGeoJsonData(countriesGeoJson);
+
+    // Generate and store colors for each country only once
+    const colors = {};
+    countriesGeoJson.features.forEach(feature => {
+      colors[feature.properties.name] = getRandomColor();
+    });
+    setCountryColors(colors);
   }, []);
 
-  // apply the random color
+  const getRandomColor = () => {
+    const blue = Math.floor(Math.random() * 200);  
+    const green = Math.floor(Math.random() * 200); 
+    const red = Math.floor(Math.random() * 30); 
+    return `rgb(${red}, ${green}, ${blue})`;
+  };
+
   const style = (feature) => {
     return {
-      fillColor: getRandomColor(),
+      fillColor: countryColors[feature.properties.name] || '#000',
       weight: 1,
       opacity: 1,
       color: 'white',
@@ -23,24 +37,12 @@ const Map = () => {
     };
   };
 
-  // blue-green random color generation
-  const getRandomColor = () => {
-    const blue = Math.floor(Math.random() * 200);  
-    const green = Math.floor(Math.random() * 200); 
-    const red = Math.floor(Math.random() * 30); 
-    return `rgb(${red}, ${green}, ${blue})`;
-  };
-
-  // bind country name to map
+  // Bind country name and click event
   const onEachFeature = (feature, layer) => {
     const countryName = feature.properties.name;
-
     if (countryName) {
-      layer.bindTooltip(countryName, {
-        permanent: false,
-        direction: 'center',
-        className: 'country-tooltip', 
-      });
+      layer.bindTooltip(countryName, { permanent: false, direction: 'center' });
+      layer.on('click', () => onCountrySelect(countryName));
     }
   };
 
@@ -49,25 +51,15 @@ const Map = () => {
       center={[20, 0]}
       zoom={2}
       style={{ height: '100vh', width: '100%' }}
-      minZoom={2.5} // minimum zoom level
+      minZoom={2.5}
       maxBounds={[
-        [90, -180], 
-        [-90, 180], 
-      ]} // limit scrollig into repeat/uncolored maps 
-      maxBoundsViscosity={0.2} 
+        [90, -180],
+        [-90, 180],
+      ]}
+      maxBoundsViscosity={0.2}
     >
-      {/* TileLayer is the base map */}
-      <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
-      />
-      {/* Adding the GeoJSON data for country borders */}
-      {geoJsonData && (
-        <GeoJSON 
-          data={geoJsonData} 
-          style={style} 
-          onEachFeature={onEachFeature} 
-        />
-      )}
+      <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png" />
+      {geoJsonData && <GeoJSON data={geoJsonData} style={style} onEachFeature={onEachFeature} />}
     </MapContainer>
   );
 };
