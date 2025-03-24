@@ -1,16 +1,11 @@
-// src/App.js
 import React, { useState } from 'react';
-import Map from './components/Map';
+import HomeScreen from './HomeScreen';
+import MapScreen from './MapScreen';
 
 const App = () => {
-  const [selectedCountry, setSelectedCountry] = useState('None');
+  const [showMap, setShowMap] = useState(false);
 
-  return (
-    <div>
-      <h1>Country selected: {selectedCountry}</h1>
-      <Map onCountrySelect={setSelectedCountry} />
-    </div>
-  );
+  return showMap ? <MapScreen /> : <HomeScreen onStart={() => setShowMap(true)} />;
 };
 
 export default App;
