@@ -1,3 +1,12 @@
+  # Ecosphere
+
+  ## Ecosphere is a web app to provide information on ecological information of the world on a country-by-country basis. This includes temperature, CO2 emissions, and ecological diversity data.
+   **Setup** - Run the following CLI command: 
+   ```
+   npm start
+   ```
+
+
 *Potential Tech Stacks:*
 1. 3D Globe and Country Selection
 - CesiumJS or Three.js – for rendering a 3D globe
